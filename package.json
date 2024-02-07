@@ -2,7 +2,7 @@
     "name": "coe-cotrip-incidents",
     "type": "module",
     "prviate": true,
-    "version": "2.4.0",
+    "version": "3.0.0",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -16,7 +16,7 @@
         "eslint-plugin-node": "^11.1.0"
     },
     "dependencies": {
-        "@tak-ps/etl": "^2.0.1",
+        "@tak-ps/etl": "^3.0.1",
         "moment-timezone": "^0.5.43"
     }
 }
