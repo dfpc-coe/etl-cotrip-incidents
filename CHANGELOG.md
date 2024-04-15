@@ -10,7 +10,7 @@
 
 ## Version History
 
-### v2.5.1
+### v4.0.0
 
 - :bug: Add TSConfig File
 
