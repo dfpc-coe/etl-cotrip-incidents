@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.5.0
+
+- :rocket: Use metadata
+
 ### v2.4.0
 
 - :rocket: Add travelerInformationMessage
