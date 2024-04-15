@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.5.1
+
+- :bug: Add TSConfig File
+
 ### v2.5.0
 
 - :rocket: Use metadata
