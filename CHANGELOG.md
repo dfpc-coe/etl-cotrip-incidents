@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v4.1.0
+
+- :arrow_up: Update ETL
+
 ### v4.0.0
 
 - :bug: Add TSConfig File
