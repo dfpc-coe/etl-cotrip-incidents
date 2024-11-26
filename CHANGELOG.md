@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v4.2.1
+
+- :bug: Fix InputFeature types
+
 ### v4.2.0
 
 - :rocket: Include additional fields
