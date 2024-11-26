@@ -6,20 +6,20 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "lint": "eslint *.js",
+        "lint": "eslint *.ts",
         "build": "tsc --build",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "exit 0"
     },
     "author": "Nick Ingalls <nick@ingalls.ca>",
     "license": "ISC",
     "devDependencies": {
-        "eslint": "^8.31.0",
+        "eslint": "^9.0.0",
         "typescript": "^5.4.5",
-        "typescript-eslint": "^7.7.0"
+        "typescript-eslint": "^8.0.0"
     },
     "dependencies": {
-        "@sinclair/typebox": "^0.32.20",
-        "@tak-ps/etl": "^4.3.4",
+        "@sinclair/typebox": "^0.34.0",
+        "@tak-ps/etl": "^6.0.0",
         "moment-timezone": "^0.5.43"
     }
 }

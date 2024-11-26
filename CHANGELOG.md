@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v4.2.0
+
+- :rocket: Include additional fields
+
 ### v4.1.0
 
 - :arrow_up: Update ETL
