@@ -1,6 +1,7 @@
 import moment from 'moment-timezone';
-import { Type, TSchema } from '@sinclair/typebox';
-import ETL, { InputFeatureCollection, Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
+import type { Feature } from 'geojson';
+import { Static, Type, TSchema } from '@sinclair/typebox';
+import ETL, { InputFeatureCollection, InputFeature, Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
 
 export default class Task extends ETL {
     async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
@@ -52,7 +53,7 @@ export default class Task extends ETL {
         } while (res.headers.has('next-offset') && res.headers.get('next-offset') !== 'None');
         console.log(`ok - fetched ${incidents.length} incidents`);
 
-        const features: Feature[] = [];
+        const features: Static<typeof InputFeature>[] = [];
         for (const feature of incidents.map((incident) => {
             return {
                 id: incident.properties.id,
@@ -77,14 +78,14 @@ export default class Task extends ETL {
                     }
                 },
                 geometry: incident.geometry
-            } as Feature;
+            } as Static<typeof InputFeature>;
         })) {
             if (feature.geometry.type.startsWith('Multi')) {
                 const feat = JSON.stringify(feature);
                 const type = feature.geometry.type.replace('Multi', '');
 
                 let i = 0;
-                // @ts-expect-error GeomCollect has no geometry coordinates
+
                 for (const coordinates of feature.geometry.coordinates) {
                     const new_feat = JSON.parse(feat);
                     new_feat.geometry = { type, coordinates };
@@ -102,7 +103,7 @@ export default class Task extends ETL {
         if (layer.environment['LineString Geometries']) allowed.push('LineString');
         if (layer.environment['Polygon Geometries']) allowed.push('Polygon');
 
-        const fc: InputFeatureCollection = {
+        const fc: Static<typeof InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: features.filter((feat) => {
                 return allowed.includes(feat.geometry.type);
