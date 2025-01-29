@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v4.3.0
+
+- :tada: Add Capabilities
+
 ### v4.2.1
 
 - :bug: Fix InputFeature types

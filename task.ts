@@ -1,33 +1,44 @@
 import moment from 'moment-timezone';
 import type { Feature } from 'geojson';
 import { Static, Type, TSchema } from '@sinclair/typebox';
-import ETL, { InputFeatureCollection, InputFeature, Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
+import ETL, { InputFeatureCollection, InputFeature, Event, SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
 
 export default class Task extends ETL {
-    async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
-        if (type === SchemaType.Input) {
-            return Type.Object({
-                'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
-                'Point Geometries': Type.Boolean({ description: 'Allow point geometries', default: true }),
-                'LineString Geometries': Type.Boolean({ description: 'Allow LineString geometries', default: true }),
-                'Polygon Geometries': Type.Boolean({ description: 'Allow Polygon Geometries', default: true }),
-                'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false, })
-            });
+    static name = 'etl-cotrip-incidents';
+    static flow = [ DataFlowType.Incoming ];
+    static invocation = [ InvocationType.Schedule ];
+
+    async schema(
+        type: SchemaType = SchemaType.Input,
+        flow: DataFlowType = DataFlowType.Incoming
+    ): Promise<TSchema> {
+        if (flow === DataFlowType.Incoming) {
+            if (type === SchemaType.Input) {
+                return Type.Object({
+                    'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
+                    'Point Geometries': Type.Boolean({ description: 'Allow point geometries', default: true }),
+                    'LineString Geometries': Type.Boolean({ description: 'Allow LineString geometries', default: true }),
+                    'Polygon Geometries': Type.Boolean({ description: 'Allow Polygon Geometries', default: true }),
+                    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false, })
+                });
+            } else {
+                return Type.Object({
+                    incident_type: Type.String(),
+                    status: Type.String(),
+                    direction: Type.Number(),
+                    routeName: Type.String(),
+                    severity: Type.String(),
+                    responseLevel: Type.String(),
+                    category: Type.String(),
+                    startTime: Type.String(),
+                    startMarker: Type.Optional(Type.Number()),
+                    endMarker: Type.Optional(Type.Number()),
+                    lastUpdated: Type.String(),
+                    travelerInformationMessage: Type.String(),
+                });
+            }
         } else {
-            return Type.Object({
-                incident_type: Type.String(),
-                status: Type.String(),
-                direction: Type.Number(),
-                routeName: Type.String(),
-                severity: Type.String(),
-                responseLevel: Type.String(),
-                category: Type.String(),
-                startTime: Type.String(),
-                startMarker: Type.Optional(Type.Number()),
-                endMarker: Type.Optional(Type.Number()),
-                lastUpdated: Type.String(),
-                travelerInformationMessage: Type.String(),
-            });
+            return Type.Object({});
         }
     }
 
@@ -114,8 +125,7 @@ export default class Task extends ETL {
     }
 }
 
-env(import.meta.url)
-await local(new Task(), import.meta.url);
+await local(new Task(import.meta.url), import.meta.url);
 export async function handler(event: Event = {}) {
-    return await internal(new Task(), event);
+    return await internal(new Task(import.meta.url), event);
 }
