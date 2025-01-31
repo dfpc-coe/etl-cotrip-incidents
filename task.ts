@@ -3,6 +3,14 @@ import type { Feature } from 'geojson';
 import { Static, Type, TSchema } from '@sinclair/typebox';
 import ETL, { InputFeatureCollection, InputFeature, Event, SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
 
+const InputSchema = Type.Object({
+    'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
+    'Point Geometries': Type.Boolean({ description: 'Allow point geometries', default: true }),
+    'LineString Geometries': Type.Boolean({ description: 'Allow LineString geometries', default: true }),
+    'Polygon Geometries': Type.Boolean({ description: 'Allow Polygon Geometries', default: true }),
+    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false, })
+});
+
 export default class Task extends ETL {
     static name = 'etl-cotrip-incidents';
     static flow = [ DataFlowType.Incoming ];
@@ -14,13 +22,7 @@ export default class Task extends ETL {
     ): Promise<TSchema> {
         if (flow === DataFlowType.Incoming) {
             if (type === SchemaType.Input) {
-                return Type.Object({
-                    'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
-                    'Point Geometries': Type.Boolean({ description: 'Allow point geometries', default: true }),
-                    'LineString Geometries': Type.Boolean({ description: 'Allow LineString geometries', default: true }),
-                    'Polygon Geometries': Type.Boolean({ description: 'Allow Polygon Geometries', default: true }),
-                    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false, })
-                });
+                return InputSchema;
             } else {
                 return Type.Object({
                     incident_type: Type.String(),
@@ -43,11 +45,11 @@ export default class Task extends ETL {
     }
 
     async control() {
-        const layer = await this.fetchLayer();
+        const env = await this.env(InputSchema);
 
         const api = 'https://data.cotrip.org/';
-        if (!layer.environment.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
-        const token = layer.environment.COTRIP_TOKEN;
+        if (!env.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
+        const token = env.COTRIP_TOKEN;
 
         const incidents: Feature[] = [];
         let batch = -1;
@@ -110,9 +112,9 @@ export default class Task extends ETL {
         }
 
         const allowed: string[] = [];
-        if (layer.environment['Point Geometries']) allowed.push('Point');
-        if (layer.environment['LineString Geometries']) allowed.push('LineString');
-        if (layer.environment['Polygon Geometries']) allowed.push('Polygon');
+        if (env['Point Geometries']) allowed.push('Point');
+        if (env['LineString Geometries']) allowed.push('LineString');
+        if (env['Polygon Geometries']) allowed.push('Polygon');
 
         const fc: Static<typeof InputFeatureCollection> = {
             type: 'FeatureCollection',
