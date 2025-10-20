@@ -1,7 +1,8 @@
 import moment from 'moment-timezone';
-import type { Feature } from 'geojson';
+import { Feature } from '@tak-ps/node-cot'
+import type { Feature as GeoJSONFeature } from 'geojson';
 import { Static, Type, TSchema } from '@sinclair/typebox';
-import ETL, { InputFeatureCollection, InputFeature, Event, SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
+import ETL, { Event, SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
 
 const InputSchema = Type.Object({
     'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
@@ -51,7 +52,7 @@ export default class Task extends ETL {
         if (!env.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
         const token = env.COTRIP_TOKEN;
 
-        const incidents: Feature[] = [];
+        const incidents: GeoJSONFeature[] = [];
         let batch = -1;
         let res;
         do {
@@ -66,7 +67,7 @@ export default class Task extends ETL {
         } while (res.headers.has('next-offset') && res.headers.get('next-offset') !== 'None');
         console.log(`ok - fetched ${incidents.length} incidents`);
 
-        const features: Static<typeof InputFeature>[] = [];
+        const features: Static<typeof Feature.InputFeature>[] = [];
         for (const feature of incidents.map((incident) => {
             return {
                 id: incident.properties.id,
@@ -91,7 +92,7 @@ export default class Task extends ETL {
                     }
                 },
                 geometry: incident.geometry
-            } as Static<typeof InputFeature>;
+            } as Static<typeof Feature.InputFeature>;
         })) {
             if (feature.geometry.type.startsWith('Multi')) {
                 const feat = JSON.stringify(feature);
@@ -116,7 +117,7 @@ export default class Task extends ETL {
         if (env['LineString Geometries']) allowed.push('LineString');
         if (env['Polygon Geometries']) allowed.push('Polygon');
 
-        const fc: Static<typeof InputFeatureCollection> = {
+        const fc: Static<typeof Feature.InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: features.filter((feat) => {
                 return allowed.includes(feat.geometry.type);
