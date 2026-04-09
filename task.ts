@@ -59,7 +59,10 @@ export default class Task extends ETL {
             console.log(`ok - fetching ${++batch} of incidents`);
             const url = new URL('/api/v1/incidents', api);
             url.searchParams.append('apiKey', String(token));
-            if (res) url.searchParams.append('offset', res.headers.get('next-offset'));
+            if (res) {
+                const nextOffset = res.headers.get('next-offset');
+                if (nextOffset) url.searchParams.append('offset', nextOffset);
+            }
 
             res = await fetch(url);
 
@@ -69,6 +72,8 @@ export default class Task extends ETL {
 
         const features: Static<typeof Feature.InputFeature>[] = [];
         for (const feature of incidents.map((incident) => {
+            if (!incident.properties) return null;
+
             return {
                 id: incident.properties.id,
                 type: 'Feature',
@@ -94,6 +99,8 @@ export default class Task extends ETL {
                 geometry: incident.geometry
             } as Static<typeof Feature.InputFeature>;
         })) {
+            if (!feature) continue;
+
             if (feature.geometry.type.startsWith('Multi')) {
                 const feat = JSON.stringify(feature);
                 const type = feature.geometry.type.replace('Multi', '');
