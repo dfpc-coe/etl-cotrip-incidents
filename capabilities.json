@@ -1,0 +1,27 @@
+{
+    "version": "1.0",
+    "name": "COtrip Incidents",
+    "description": "Ingests road incident and closure data from the Colorado COtrip system and posts them to the map.",
+    "compute": {
+        "memory": 512,
+        "timeout": 60
+    },
+    "permissions": [
+        {
+            "resource": "feature:*",
+            "required": true,
+            "description": "COtrip Incidents posts road incidents and closures to the map"
+        }
+    ],
+    "invocations": {
+        "incoming": {
+            "schedule": {
+                "description": "Polls the Colorado COtrip system for updated road incidents on a schedule.",
+                "default": {
+                    "enabled": true,
+                    "schedule": "rate(1 minute)"
+                }
+            }
+        }
+    }
+}
