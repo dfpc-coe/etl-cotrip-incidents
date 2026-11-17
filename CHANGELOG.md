@@ -12,6 +12,13 @@
 
 ### Pending Release
 
+### v5.15.0 - 2026-11-17
+
+- :rocket: Explicitly submit LineString & Polygon incidents as `u-d-f` shapes - an `a-f-G` type on a shape is otherwise delivered by CloudTAK as a marker with a companion polyline
+- :arrow_up: Migrate to TS7 for blazing build times
+- :arrow_up: Migrate off ESLint onto OXLint for blazing lint times
+- :bug: Fix numerous small bugs in the codebase surfaced by OXLint
+
 ### v5.14.0
 
 - :arrow_up: Update `@tak-ps/etl` to 11.x - Output schemas are published as named schemas, as required by CloudTAK v14
